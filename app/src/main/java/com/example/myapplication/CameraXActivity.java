@@ -6,8 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -108,7 +106,7 @@ public class CameraXActivity extends AppCompatActivity {
                     //2 图像分析接口
                     myAnalyzer = new ImageAnalysis.Builder().build();
                     myAnalyzer.setAnalyzer(cameraExecutor,
-                            new LuminosityAnalyzer());
+                            new QRcodeAnalyzer());
                     //3 拍照 接口
                     imageCapture = new ImageCapture.Builder().build();
                     //4 把我们需要的这三个接口安装到相机管理器的主线路上，实现截取数据的目的

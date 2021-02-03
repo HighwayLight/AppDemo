@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
-import androidx.camera.core.VideoCapture;
 import androidx.camera.view.video.OnVideoSavedCallback;
 import androidx.camera.view.video.OutputFileResults;
 import androidx.core.app.ActivityCompat;
@@ -35,8 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static androidx.camera.core.CameraX.getContext;
 
 /**
  * Created by dushu on 2021/2/2 .
@@ -65,7 +62,7 @@ public class CameraX2Activity extends AppCompatActivity {
         myAnalyzer = new ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
-        myAnalyzer.setAnalyzer(cameraExecutor, new LuminosityAnalyzer());
+        myAnalyzer.setAnalyzer(cameraExecutor, new QRcodeAnalyzer());
         cameraXView.bindToLifecycle(this, myAnalyzer);
 
         recordButton = findViewById(R.id.record_button);// 拍照按钮
@@ -81,7 +78,10 @@ public class CameraX2Activity extends AppCompatActivity {
         recordButton.setOnLongClickListener(new CameraButton.OnLongClickListener() {
             @Override
             public void onLongClick() {
-                if (allPermissionGranted()) {
+                if (allPermissionGranted()
+                        && (cameraXView.getCaptureMode() == CameraXView.CaptureMode.VIDEO
+                        || cameraXView.getCaptureMode() == CameraXView.CaptureMode.MIXED)) {
+
                     takeVideo();
                 } else {
                     ActivityCompat.requestPermissions(CameraX2Activity.this,

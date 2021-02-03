@@ -5,6 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -12,7 +15,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +32,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.camera.CameraXView;
+import com.example.myapplication.camera.QRCodeUtil;
 import com.example.myapplication.widget.CameraButton;
 
 import java.io.File;
@@ -45,6 +52,8 @@ public class CameraX2Activity extends AppCompatActivity {
 
     CameraXView cameraXView;
     CameraButton recordButton;
+    private Button selectImage;
+    private final int DEVICE_PHOTO_REQUEST = 3;
 
     ImageAnalysis myAnalyzer;
 
@@ -66,6 +75,15 @@ public class CameraX2Activity extends AppCompatActivity {
         cameraXView.bindToLifecycle(this, myAnalyzer);
 
         recordButton = findViewById(R.id.record_button);// 拍照按钮
+        selectImage = findViewById(R.id.selectImage);
+        selectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, DEVICE_PHOTO_REQUEST);
+            }
+        });
+
         cameraXView.setCaptureMode(CameraXView.CaptureMode.MIXED);
 
         recordButton.setOnClickListener(new CameraButton.OnClickListener() {
@@ -190,6 +208,36 @@ public class CameraX2Activity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //用户没有进行有效的设置操作，返回
+        if (requestCode == AppCompatActivity.RESULT_CANCELED ){
+            return;
+        }
+        if (DEVICE_PHOTO_REQUEST == requestCode){
+            if (null != data) {
+                Uri selectedImage = data.getData();
+                String[] filePathColumns = {MediaStore.Images.Media.DATA};
+                String imagePath;
+                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+                if (c != null) {
+                    c.moveToFirst();
+                    int columnIndex = c.getColumnIndex(filePathColumns[0]);
+                    imagePath = c.getString(columnIndex);
+                    c.close();
+
+                    Toast.makeText(CameraX2Activity.this, "imagePath:" + imagePath, Toast.LENGTH_LONG).show();
+                    Bitmap bm = BitmapFactory.decodeFile(imagePath);
+
+                    if (bm != null) {
+                        QRCodeUtil.parseQrCode(bm);
+                    }
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

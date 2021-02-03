@@ -20,26 +20,36 @@
         android:layout_height="104dp"
         android:layout_marginBottom="50dp"
         android:background="#00000000"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:maxTime="10000"
         app:minTime="1000"
         app:progressColor="#8286F7"
-        app:progressWidth="4dp"
-        android:visibility="visible"/>
+        app:progressWidth="4dp" />
 
     <com.example.myapplication.widget.CameraFocusBar
         android:id="@+id/focusBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00000000"
+        android:src="@mipmap/camera_focus_frame"
         app:duration_focus="2000"
         app:fromScale="1.0"
-        app:toScale="0.5"
-        android:src="@mipmap/camera_focus_frame"
+        app:layout_constraintBaseline_toBaselineOf="@id/record_button"
         app:layout_constraintLeft_toRightOf="@id/record_button"
-        app:layout_constraintBaseline_toBaselineOf="@id/record_button"/>
+        app:toScale="0.5" />
+
+    <Button
+        android:id="@+id/selectImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="selectImage"
+        app:layout_constraintBaseline_toBaselineOf="@id/record_button"
+        app:layout_constraintRight_toLeftOf="@id/record_button" />
+
 
     <!--    <com.example.myapplication.RecordButton
             android:id="@+id/record_button"

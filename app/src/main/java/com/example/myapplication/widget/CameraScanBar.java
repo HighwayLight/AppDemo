@@ -15,7 +15,7 @@ import com.example.myapplication.R;
 
 /**
  * Create by zhongyao on 2021/2/2
- * Description:
+ * Description: 相机扫一扫动画条
  */
 public class CameraScanBar extends AppCompatImageView {
     private AnimatorSet mAnimatorSet;
@@ -39,7 +39,9 @@ public class CameraScanBar extends AppCompatImageView {
     }
 
     private void AnimInit(Context context, AttributeSet attrs) {
-
+        if (context == null || attrs == null) {
+            return;
+        }
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.CameraScanBar);
         long duration = array.getInt(R.styleable.CameraScanBar_duration, 3000);
         float startY = array.getDimension(R.styleable.CameraScanBar_startY, 0);

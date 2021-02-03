@@ -2,14 +2,11 @@
 <resources>
 
     <declare-styleable name="RecordButton">
-
-        <attr name="bg_color" format="color"/>
-        <attr name="stroke_color" format="color"/>
-        <attr name="stroke_width" format="dimension"/>
-        <attr name="duration_0" format="integer"/>
-        <attr name="radius" format="dimension"/>
-
-
+        <attr name="bg_color" format="color" />
+        <attr name="stroke_color" format="color" />
+        <attr name="stroke_width" format="dimension" />
+        <attr name="duration_0" format="integer" />
+        <attr name="radius" format="dimension" />
     </declare-styleable>
 
 
@@ -26,10 +23,12 @@
         <attr name="endY" format="dimension" />
         <attr name="startAlpha" format="float" />
         <attr name="endAlpha" format="float" />
-
     </declare-styleable>
 
-
-
+    <declare-styleable name="CameraFocusBar">
+        <attr name="duration_focus" format="integer"/>
+        <attr name="fromScale" format="float"/>
+        <attr name="toScale" format="float"/>
+    </declare-styleable>
 
 </resources>

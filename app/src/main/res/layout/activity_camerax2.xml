@@ -26,7 +26,20 @@
         app:maxTime="10000"
         app:minTime="1000"
         app:progressColor="#8286F7"
-        app:progressWidth="4dp" />
+        app:progressWidth="4dp"
+        android:visibility="visible"/>
+
+    <com.example.myapplication.widget.CameraFocusBar
+        android:id="@+id/focusBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        app:duration_focus="2000"
+        app:fromScale="1.0"
+        app:toScale="0.5"
+        android:src="@mipmap/camera_focus_frame"
+        app:layout_constraintLeft_toRightOf="@id/record_button"
+        app:layout_constraintBaseline_toBaselineOf="@id/record_button"/>
 
     <!--    <com.example.myapplication.RecordButton
             android:id="@+id/record_button"

@@ -37,7 +37,7 @@ public class QRcodeAnalyzer implements ImageAnalysis.Analyzer {
 
     public QRcodeAnalyzer(){
         hints1.put(DecodeHintType.CHARACTER_SET, "utf-8");
-        hints1.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+//        hints1.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
         hints1.put(DecodeHintType.POSSIBLE_FORMATS, BarcodeFormat.QR_CODE);
     }
 

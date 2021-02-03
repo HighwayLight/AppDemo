@@ -56,7 +56,7 @@ public class RecordButton extends View implements View.OnLongClickListener, View
         mBgColor = typedArray.getColor(R.styleable.RecordButton_bg_color, Color.WHITE);
         mStrokeColor = typedArray.getColor(R.styleable.RecordButton_stroke_color, Color.RED);
         mStrokeWidth = typedArray.getDimensionPixelOffset(R.styleable.RecordButton_stroke_width, Dp2Px(context,5));
-        mDuration = typedArray.getInteger(R.styleable.RecordButton_duration, 10);
+        mDuration = typedArray.getInteger(R.styleable.RecordButton_duration_0, 10);
         mRadius = typedArray.getDimensionPixelOffset(R.styleable.RecordButton_radius, Dp2Px(context,40));
         typedArray.recycle();
 

@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.camera.CameraXView;
+import com.example.myapplication.widget.CameraButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,7 +47,7 @@ public class CameraX2Activity extends AppCompatActivity {
     private static final String FILENAME_FORMATE = "yyyy-MM-DD-HH-mm-ss";
 
     CameraXView cameraXView;
-    RecordButton recordButton;
+    CameraButton recordButton;
 
     ImageAnalysis myAnalyzer;
 
@@ -68,28 +69,33 @@ public class CameraX2Activity extends AppCompatActivity {
         cameraXView.bindToLifecycle(this, myAnalyzer);
 
         recordButton = findViewById(R.id.record_button);// 拍照按钮
-        cameraXView.setCaptureMode(CameraXView.CaptureMode.IMAGE);
-        recordButton.setOnRecordListener(new RecordButton.OnRecordListener() {
+        cameraXView.setCaptureMode(CameraXView.CaptureMode.MIXED);
+
+        recordButton.setOnClickListener(new CameraButton.OnClickListener() {
             @Override
-            public void onTackPicture() {
-//                cameraXView.setCaptureMode(CameraXView.CaptureMode.IMAGE);
+            public void onClick() {
                 takephoto();
             }
+        });
 
+        recordButton.setOnLongClickListener(new CameraButton.OnLongClickListener() {
             @Override
-            public void onRecordVideo() {
-//                cameraXView.setCaptureMode(CameraXView.CaptureMode.VIDEO);
+            public void onLongClick() {
                 if (allPermissionGranted()) {
                     takeVideo();
                 } else {
                     ActivityCompat.requestPermissions(CameraX2Activity.this,
-                            new String[]{Manifest.permission.RECORD_AUDIO},11);
+                            new String[]{Manifest.permission.RECORD_AUDIO}, 11);
                 }
             }
 
-            @SuppressLint("UnsafeExperimentalUsageError")
             @Override
-            public void onFinish() {
+            public void onNoMinRecord(int currentTime) {
+
+            }
+
+            @Override
+            public void onRecordFinishedListener() {
                 if (cameraXView.isRecording()) {
                     cameraXView.stopRecording();
                 }
@@ -182,8 +188,8 @@ public class CameraX2Activity extends AppCompatActivity {
 
     private boolean allPermissionGranted() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED  && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                == PackageManager.PERMISSION_GRANTED  ;
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override

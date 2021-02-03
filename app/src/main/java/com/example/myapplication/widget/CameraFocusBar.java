@@ -43,6 +43,7 @@ public class CameraFocusBar extends AppCompatImageView {
         long duration = array.getInt(R.styleable.CameraFocusBar_duration_focus, 5000);
         float fromScale = array.getFloat(R.styleable.CameraFocusBar_fromScale, 1.0f);
         float toScale = array.getFloat(R.styleable.CameraFocusBar_toScale, 0.5f);
+        array.recycle();
 
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(this, "scaleY", fromScale, toScale);
         scaleY.setRepeatCount(ValueAnimator.INFINITE);

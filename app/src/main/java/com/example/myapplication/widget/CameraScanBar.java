@@ -48,7 +48,7 @@ public class CameraScanBar extends AppCompatImageView {
         float endY = array.getDimension(R.styleable.CameraScanBar_endY, 1000);
         float startAlpha = array.getFloat(R.styleable.CameraScanBar_startAlpha, 0.2f);
         float endAlpha = array.getFloat(R.styleable.CameraScanBar_endAlpha, 1.0f);
-
+        array.recycle();
 
         ObjectAnimator yAnim = ObjectAnimator.ofFloat(this, "Y", startY, endY);
         yAnim.setRepeatCount(ValueAnimator.INFINITE);

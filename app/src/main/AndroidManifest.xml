@@ -27,6 +27,7 @@
         <activity android:name=".CameraActivity"></activity>
         <activity android:name=".CameraXActivity"></activity>
         <activity android:name=".CameraX2Activity"></activity>
+        <activity android:name=".CameraX2ScanActivity"></activity>
     </application>
 
 </manifest>

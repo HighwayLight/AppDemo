@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.example.myapplication.camera.CameraXView
+        android:id="@+id/camera_x_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.example.myapplication.widget.CameraScanBar
+        android:id="@+id/scanBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/camera_scan_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:duration="3000"/>
+
+    <TextView
+        android:id="@+id/scanDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="扫一扫二维码识别和添加好友"
+        app:layout_constraintTop_toBottomOf="@id/scanBar"
+        app:layout_constraintBottom_toTopOf="@id/qrCode"
+        android:layout_marginBottom="300dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/qrCode"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="92dp"
+        android:background="@mipmap/camera_circle_bg"
+        android:scaleType="centerInside"
+        android:src="@mipmap/camera_self_qr_code"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/selectImage"
+        android:layout_marginLeft="200dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/selectImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="100dp"
+        android:background="@mipmap/camera_circle_bg"
+        android:scaleType="centerInside"
+        android:src="@mipmap/camera_photo_album"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="200dp"
+        app:layout_constraintLeft_toRightOf="@id/qrCode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/qrCode"
+        app:layout_constraintVertical_bias="0.904" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

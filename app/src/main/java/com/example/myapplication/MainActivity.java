@@ -67,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, CameraX2Activity.class));
             }
         });
+
+        findViewById(R.id.buttonScan).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CameraX2ScanActivity.class));
+            }
+        });
         editText = findViewById(R.id.editText);
         editText.setGravity(Gravity.CENTER);
 

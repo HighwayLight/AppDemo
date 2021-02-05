@@ -51,7 +51,7 @@ public class QRcodeAnalyzer implements ImageAnalysis.Analyzer {
         byte[] b = new byte[buffer.remaining()];
         buffer.get(b);
         // 按你的需要处理图片吧
-        Log.e("TAG", "实时帧数据");
+        Log.i("TAG", "实时帧数据");
         int height = image.getHeight();
         int width = image.getWidth();
         //TODO 调整crop的矩形区域，目前是全屏（全屏有更好的识别体验，但是在部分手机上可能OOM）

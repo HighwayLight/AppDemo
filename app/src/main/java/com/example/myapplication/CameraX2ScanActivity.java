@@ -34,10 +34,15 @@ import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.camera.CameraXView;
 import com.example.myapplication.camera.QRCodeUtil;
+import com.example.myapplication.decode.DecodeImgCallback;
+import com.example.myapplication.decode.DecodeImgThread;
+import com.example.myapplication.decode.ImageUtil;
 import com.example.myapplication.widget.CameraButton;
+import com.google.zxing.Result;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -185,23 +190,46 @@ public class CameraX2ScanActivity extends AppCompatActivity {
         }
         if (DEVICE_PHOTO_REQUEST == requestCode){
             if (null != data) {
-                Uri selectedImage = data.getData();
-                String[] filePathColumns = {MediaStore.Images.Media.DATA};
-                String imagePath;
-                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
-                if (c != null) {
-                    c.moveToFirst();
-                    int columnIndex = c.getColumnIndex(filePathColumns[0]);
-                    imagePath = c.getString(columnIndex);
-                    c.close();
 
-                    Toast.makeText(CameraX2ScanActivity.this, "imagePath:" + imagePath, Toast.LENGTH_LONG).show();
-                    Bitmap bm = BitmapFactory.decodeFile(imagePath);
-
-                    if (bm != null) {
-                        QRCodeUtil.parseQrCode(bm);
+                String path = ImageUtil.getImageAbsolutePath(this, data.getData());
+                new DecodeImgThread(path, new DecodeImgCallback() {
+                    @Override
+                    public void onImageDecodeSuccess(Result result) {
+                        Log.e(TAG, "result = " + result.getText());
                     }
-                }
+
+                    @Override
+                    public void onImageDecodeFailed() {
+                        Log.e(TAG, "onImageDecodeFailed = 二维码解析异常");
+                    }
+                }).run();
+//                Uri selectedImage = data.getData();
+//                try {
+//                    Bitmap bm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+//                    if (bm != null) {
+//                        QRCodeUtil.parseQrCode(bm);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+
+//                String[] filePathColumns = {MediaStore.Images.Media.DATA};
+//                String imagePath;
+//                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+//                if (c != null) {
+//                    c.moveToFirst();
+//                    int columnIndex = c.getColumnIndex(filePathColumns[0]);
+//                    imagePath = c.getString(columnIndex);
+//                    c.close();
+//
+//                    Toast.makeText(CameraX2ScanActivity.this, "imagePath:" + imagePath, Toast.LENGTH_LONG).show();
+//                    Bitmap bm = BitmapFactory.decodeFile(imagePath);
+//
+//                    if (bm != null) {
+//                        QRCodeUtil.parseQrCode(bm);
+//                    }
+//                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

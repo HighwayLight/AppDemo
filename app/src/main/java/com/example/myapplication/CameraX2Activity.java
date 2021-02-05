@@ -33,6 +33,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.camera.CameraXView;
 import com.example.myapplication.camera.QRCodeUtil;
+import com.example.myapplication.decode.DecodeImgThread;
 import com.example.myapplication.widget.CameraButton;
 
 import java.io.File;
@@ -84,7 +85,7 @@ public class CameraX2Activity extends AppCompatActivity {
             }
         });
 
-        cameraXView.setCaptureMode(CameraXView.CaptureMode.MIXED);
+        cameraXView.setCaptureMode(CameraXView.CaptureMode.IMAGE);
 
         recordButton.setOnClickListener(new CameraButton.OnClickListener() {
             @Override
@@ -229,7 +230,8 @@ public class CameraX2Activity extends AppCompatActivity {
                     c.close();
 
                     Toast.makeText(CameraX2Activity.this, "imagePath:" + imagePath, Toast.LENGTH_LONG).show();
-                    Bitmap bm = BitmapFactory.decodeFile(imagePath);
+//                    Bitmap bm = BitmapFactory.decodeFile(imagePath);
+                    Bitmap bm = DecodeImgThread.getBitmap(imagePath, 400, 400);
 
                     if (bm != null) {
                         QRCodeUtil.parseQrCode(bm);

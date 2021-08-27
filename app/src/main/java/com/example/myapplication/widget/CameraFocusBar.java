@@ -1,11 +1,15 @@
 package com.example.myapplication.widget;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -16,6 +20,8 @@ import com.example.myapplication.R;
  * Description:相加聚焦动画框
  */
 public class CameraFocusBar extends AppCompatImageView {
+
+    AnimatorSet animatorSet;
 
     public CameraFocusBar(Context context) {
         super(context);
@@ -46,15 +52,44 @@ public class CameraFocusBar extends AppCompatImageView {
         array.recycle();
 
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(this, "scaleY", fromScale, toScale);
-        scaleY.setRepeatCount(ValueAnimator.INFINITE);
+//        scaleY.setRepeatCount(ValueAnimator.INFINITE);
         scaleY.setDuration(duration);
 
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(this, "scaleX", fromScale, toScale);
-        scaleX.setRepeatCount(ValueAnimator.INFINITE);
+//        scaleX.setRepeatCount(ValueAnimator.INFINITE);
         scaleX.setDuration(duration);
 
-        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet = new AnimatorSet();
         animatorSet.play(scaleY).with(scaleX);
+//        animatorSet.start();
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                Log.e("CameraFocusBar", "onAnimationEnd: ");
+                if (isShown()) {
+                    setVisibility(GONE);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         animatorSet.start();
+    }
+
+    public void setFocusPoint(float x , float y){
+        if (!isShown()) {
+            setVisibility(VISIBLE);
+        }
+        setX(x - getWidth()/2f);
+        setY(y - getHeight()/2f);
+        if (animatorSet != null) {
+            animatorSet.start();
+        }
     }
 }

@@ -37,11 +37,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     //用于在子线程中处理图片数据
     private Handler mBackgroundHandler;
 
+    public void xiaoTa(){
+
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-
         mCameraView = findViewById(R.id.camera);
         //添加相机监听回调
         if (mCameraView != null) {

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -15,10 +16,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +39,7 @@ import com.example.myapplication.camera.CameraXView;
 import com.example.myapplication.camera.QRCodeUtil;
 import com.example.myapplication.decode.DecodeImgThread;
 import com.example.myapplication.widget.CameraButton;
+import com.example.myapplication.widget.CameraFocusBar;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,9 +56,14 @@ public class CameraX2Activity extends AppCompatActivity {
 
     private static final String FILENAME_FORMATE = "yyyy-MM-DD-HH-mm-ss";
 
-    CameraXView cameraXView;
-    CameraButton recordButton;
+    private CameraXView cameraXView;
+    private CameraButton recordButton;
+    private CameraFocusBar focusBar;
     private Button selectImage;
+    private Button stopBtn;
+    private ImageView imgPreview;
+    private VideoView videoView;
+
     private final int DEVICE_PHOTO_REQUEST = 3;
 
     ImageAnalysis myAnalyzer;
@@ -68,12 +78,13 @@ public class CameraX2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_camerax2);
 
         cameraExecutor = Executors.newSingleThreadExecutor();
+        focusBar = findViewById(R.id.focusBar);
         cameraXView = findViewById(R.id.camera_x_view);
         myAnalyzer = new ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
-        myAnalyzer.setAnalyzer(cameraExecutor, new QRcodeAnalyzer());
-        cameraXView.bindToLifecycle(this, myAnalyzer);
+//        myAnalyzer.setAnalyzer(cameraExecutor, new QRcodeAnalyzer());
+        cameraXView.bindToLifecycle(this);
 
         recordButton = findViewById(R.id.record_button);// 拍照按钮
         selectImage = findViewById(R.id.selectImage);
@@ -85,7 +96,15 @@ public class CameraX2Activity extends AppCompatActivity {
             }
         });
 
-        cameraXView.setCaptureMode(CameraXView.CaptureMode.IMAGE);
+        cameraXView.setCaptureMode(CameraXView.CaptureMode.VIDEO);
+        cameraXView.setEventListener(new CameraXView.MotionEventListener() {
+            @Override
+            public void OnMotionEvent(MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    focusBar.setFocusPoint(event.getX(), event.getY());
+                }
+            }
+        });
 
         recordButton.setOnClickListener(new CameraButton.OnClickListener() {
             @Override
@@ -97,10 +116,12 @@ public class CameraX2Activity extends AppCompatActivity {
         recordButton.setOnLongClickListener(new CameraButton.OnLongClickListener() {
             @Override
             public void onLongClick() {
+                if (cameraXView.getCaptureMode() == CameraXView.CaptureMode.IMAGE) {
+                    cameraXView.setCaptureMode(CameraXView.CaptureMode.VIDEO);
+                }
                 if (allPermissionGranted()
                         && (cameraXView.getCaptureMode() == CameraXView.CaptureMode.VIDEO
                         || cameraXView.getCaptureMode() == CameraXView.CaptureMode.MIXED)) {
-
                     takeVideo();
                 } else {
                     ActivityCompat.requestPermissions(CameraX2Activity.this,
@@ -120,20 +141,78 @@ public class CameraX2Activity extends AppCompatActivity {
                 }
             }
         });
+
+        imgPreview = findViewById(R.id.img_preview);
+        imgPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgPreview.setVisibility(View.GONE);
+            }
+        });
+
+        videoView = findViewById(R.id.video_preview);
+        videoView.setZOrderMediaOverlay(true);
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                Log.e(TAG, "videoView setOnPreparedListener.onPrepared()");
+                // 通过MediaPlayer设置循环播放
+                mp.setLooping(true);
+                // OnPreparedListener中的onPrepared方法是在播放源准备完成后回调的，所以可以在这里开启播放
+                mp.start();
+            }
+        });
+        videoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
+
+        stopBtn = findViewById(R.id.stop_btn);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                videoView.stopPlayback();
+                videoView.setVisibility(View.GONE);
+                stopBtn.setVisibility(View.GONE);
+            }
+        });
     }
 
     @SuppressLint("UnsafeExperimentalUsageError")
     private void takeVideo() {
         //创建视频保存的文件地址
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath(),
+        final File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath(),
                 System.currentTimeMillis() + ".mp4");
         cameraXView.startRecording(file, cameraExecutor, new OnVideoSavedCallback() {
 
 
             @Override
             public void onVideoSaved(@NonNull OutputFileResults outputFileResults) {
+                Uri savedUri = outputFileResults.getSavedUri();
+                if (savedUri == null) {
+                    savedUri = Uri.fromFile(file);
+                }
                 outputFilePath = file.getAbsolutePath();
                 Log.e(TAG, "Video outputFilePath = " + outputFilePath);
+
+
+                Uri finalSavedUri = savedUri;
+                CameraX2Activity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        videoView.setVisibility(View.VISIBLE);
+                        stopBtn.setVisibility(View.VISIBLE);
+                        videoView.requestFocus();
+                        videoView.setVideoURI(finalSavedUri);
+                        // 开始播放
+                        videoView.start();
+                    }
+                });
+
+
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Video.Media.DATA, outputFilePath);
                 getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
@@ -162,6 +241,16 @@ public class CameraX2Activity extends AppCompatActivity {
                 if (savedUri == null) {
                     savedUri = Uri.fromFile(photoFile);
                 }
+                Uri finalSavedUri = savedUri;
+                cameraXView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        imgPreview.setVisibility(View.VISIBLE);
+                        imgPreview.setImageURI(finalSavedUri);
+                    }
+                });
+
+
                 outputFilePath = photoFile.getAbsolutePath();
                 Log.e(TAG, "Photo outputFilePath = " + outputFilePath);
                 try {
@@ -246,5 +335,11 @@ public class CameraX2Activity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         cameraExecutor.shutdown();
+        //释放videoView资源
+        if (videoView.isPlaying()) {
+            videoView.stopPlayback();
+        }
+        videoView.setOnPreparedListener(null);
+        videoView.suspend();
     }
 }

@@ -2,22 +2,42 @@ package com.example.myapplication;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.example.myapplication.decode.ImageUtil;
+import com.example.myapplication.scroll.ScrollActivity;
+import com.example.myapplication.video.VideoActivity;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import static com.example.myapplication.LoaderM.LOADER_ID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,8 +45,13 @@ public class MainActivity extends AppCompatActivity {
 
     View view;
 
-    int screenWidth ; // 屏幕宽（像素，如：480px）
-//    int screenHeight = getWindowManager().getDefaultDisplay().getHeight(); // 屏幕高（像素，如：800p）
+    int screenWidth; // 屏幕宽（像素，如：480px）
+    //    int screenHeight = getWindowManager().getDefaultDisplay().getHeight(); // 屏幕高（像素，如：800p）
+    int pageindex = 0;
+
+    ImageView imageView;
+
+    boolean flag = false;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -34,13 +59,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.text1).setOnClickListener(new View.OnClickListener() {
+        MTextView textView = findViewById(R.id.text1);
+        textView.setMText("你好，欢迎来到ZAO PARK。ZAO代表着一个人沉浸在TA的爱好时的状态：zealous（热情）、" +
+                "absolute（纯粹）、optimistic（乐观）。你可以加入或创建不同的兴趣圈子，和有志趣相投的人畅聊爱好，分享快乐。你也可以结识同好，" +
+                "通过兴趣认识新朋友。首先，请加入ZAO PARK官方圈子，我们需要你的鼓励，更需要你的建议。https://zao.place.fun/h/374676837286019272");
+        textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                imageLoader();
                 selectImage();
 //                getAlbum();
             }
         });
+        imageView = findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CustomViewActivity.class));
+            }
+        });
+
 
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,18 +103,63 @@ public class MainActivity extends AppCompatActivity {
         });
         editText = findViewById(R.id.editText);
         editText.setGravity(Gravity.CENTER);
+        findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                MainActivity.hideKeyboard(MainActivity.this);
+                if (!flag) {
+                    pauseMusic();
+                    flag = true;
+                } else {
+                    replayMusic();
+                    flag = false;
+                }
+            }
+        });
 
         screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 
         view = findViewById(R.id.view);
-//        Drawable _backgroundImage = getResources().getDrawable(R.mipmap.car);
-//        CustomDrawable customDrawable = new CustomDrawable(_backgroundImage);
-        CustomDrawable customDrawable = new CustomDrawable(screenWidth, Dp2Px(this, 200));
+        Drawable _backgroundImage = getResources().getDrawable(R.mipmap.car);
+        CustomDrawable customDrawable = new CustomDrawable(_backgroundImage);
+//        CustomDrawable customDrawable = new CustomDrawable(screenWidth, Dp2Px(this, 200));
         view.setBackground(customDrawable);
 
 
+        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ScrollActivity.class));
+            }
+        });
+        findViewById(R.id.button_v).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, VideoActivity.class));
+            }
+        });
 
+        findViewById(R.id.button_f).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, VideoActivity.class));
+            }
+        });
 
+//        findViewById(R.id.btn_service).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+//                startActivity(intent);
+//            }
+//        });
+
+        findViewById(R.id.button5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, GifActivity.class));
+            }
+        });
     }
 
     private void getAlbum() {
@@ -125,14 +208,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void selectImage() {
+//        String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC limit " + 2 + " offset " + pageindex * 2;
+        String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC limit " + 1;
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                Cursor cursor = getContentResolver().query(mImageUri, null, null, null, null);
+                Cursor cursor = getContentResolver().query(mImageUri, null, null, null, sortOrder);
                 while (cursor.moveToNext()) {
                     String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));// 1.获取图片的路径
-//                    Log.e("TAG", path);
+                    Log.e("TAG", path);
 
                     int photoIDIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
                     long photoId = cursor.getLong(photoIDIndex);
@@ -142,13 +227,46 @@ public class MainActivity extends AppCompatActivity {
                     long bucket_id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID));
 //                    Log.e("TAG", "bucket_id = " + bucket_id);
 
-                    getThumb(photoId);
-
+//                    getThumb(photoId);
+                    Drawable drawable = null;
+                    if (drawable == null) {
+                        try {
+                            drawable = ImageUtil.getImageDrawable(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Log.e("TAG", e.toString());
+                        }
+                    }
+                    if (drawable != null) {
+                        Drawable finalDrawable = drawable;
+                        imageView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                imageView.setImageDrawable(finalDrawable);
+                            }
+                        });
+                    } else {
+                        Log.e("TAG", "drawable = null");
+                    }
 
                 }
                 cursor.close();
             }
         }).start();
+        pageindex++;
+    }
+
+    private void imageLoader() {
+
+        this.getLoaderManager().initLoader(LOADER_ID, null,
+                new ImageLoader(this, "all", 1, pageindex, 2, new DataCallback() {
+                    @Override
+                    public void onData(List list) {
+                        Log.e("ZKMediaLibrary", "queryMedia() / onData().list.size() = "
+                                + (list == null ? "null" : list.size()));
+                    }
+                }));
+        pageindex++;
     }
 
     private String getFolderPath(String filePath) {
@@ -171,7 +289,6 @@ public class MainActivity extends AppCompatActivity {
                 mSelection,
                 null,
                 null);
-        Log.e("TAG", "01 " + (System.currentTimeMillis() - timecurrentTimeMillis));
 
 //        Cursor cur = MediaStore.Images.Thumbnails.queryMiniThumbnail(getContentResolver(),
 //                photoId, MediaStore.Images.Thumbnails.MINI_KIND,
@@ -189,9 +306,15 @@ public class MainActivity extends AppCompatActivity {
 
                 Bitmap bitmap = MediaStore.Images.Thumbnails.getThumbnail
                         (getContentResolver(), photoId, MediaStore.Images.Thumbnails.MINI_KIND, null);
-                Log.e("TAG", "03 " + (System.currentTimeMillis() - timecurrentTimeMillis));
-                BitmapDrawable drawable = new BitmapDrawable(getResources(),bitmap);
-
+                BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
+//                if (drawable != null) {
+//                    imageView.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            imageView.setImageDrawable(drawable);
+//                        }
+//                    });
+//                }
             } else {
 //                long timecurrentTimeMillis = System.currentTimeMillis();
 //                Bitmap bitmap = MediaStore.Images.Thumbnails.getThumbnail
@@ -207,4 +330,51 @@ public class MainActivity extends AppCompatActivity {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            Toast.makeText(this, "SD卡不可用~", Toast.LENGTH_SHORT).show();
+        }
+        if (Build.VERSION.SDK_INT >= 23) {
+            int REQUEST_CODE_CONTACT = 101;
+            String[] permissions = {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            //验证是否许可权限
+            for (String str : permissions) {
+                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+                    //申请权限
+                    this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
+                    return;
+                } else {
+                    //这里就是权限打开之后自己要操作的逻辑
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 隐藏键盘的方法
+     *
+     * @param context
+     */
+    public static void hideKeyboard(Activity context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        // 隐藏软键盘
+        imm.hideSoftInputFromWindow(context.getWindow().getDecorView().getWindowToken(), 0);
+    }
+
+
+    private void pauseMusic() {
+        AudioManager mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+    }
+
+    private void replayMusic() {
+        AudioManager mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        mAudioManager.abandonAudioFocus(null);
+    }
+
 }

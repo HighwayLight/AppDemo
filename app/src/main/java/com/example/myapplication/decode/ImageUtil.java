@@ -20,10 +20,20 @@ import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 获取图片的路径
@@ -124,5 +134,36 @@ public class ImageUtil {
      */
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
+
+    public static BitmapDrawable getImageDrawable(String path) throws IOException {
+        //打开文件
+        File file = new File(path);
+        if (!file.exists()) {
+            Log.e("TAG", "文件不存在");
+            return null;
+        }
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] bt = new byte[8192];
+
+        //得到文件的输入流
+        InputStream in = new FileInputStream(file);
+
+        //将文件读出到输出流中
+        int readLength = in.read(bt);
+        while (readLength != -1) {
+            outStream.write(bt, 0, readLength);
+            readLength = in.read(bt);
+        }
+
+        //转换成byte 后 再格式化成位图
+        byte[] data = outStream.toByteArray();
+        Log.e("TAG", "data.length = " + data.length);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);// 生成位图
+        BitmapDrawable bd = new BitmapDrawable(null, bitmap);
+
+        return bd;
     }
 }

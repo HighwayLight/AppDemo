@@ -108,6 +108,12 @@ public class CameraXView  extends FrameLayout {
     // For accessibility event
     private MotionEvent mUpEvent;
 
+    private MotionEventListener eventListener;
+
+    public void setEventListener(MotionEventListener eventListener){
+        this.eventListener = eventListener;
+    }
+
     public CameraXView(@NonNull Context context) {
         this(context, null);
     }
@@ -612,6 +618,9 @@ public class CameraXView  extends FrameLayout {
                         && mCameraModule.isBoundToLifecycle()) {
                     mUpEvent = event;
                     performClick();
+                    if (eventListener != null) {
+                        eventListener.OnMotionEvent(event);
+                    }
                 }
                 break;
             default:
@@ -851,4 +860,10 @@ public class CameraXView  extends FrameLayout {
         public void onScaleEnd(ScaleGestureDetector detector) {
         }
     }
+
+
+    public interface MotionEventListener{
+        void OnMotionEvent(MotionEvent event);
+    }
+
 }

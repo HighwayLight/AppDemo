@@ -54,4 +54,21 @@ dependencies {
     implementation "androidx.camera:camera-core:1.0.0-rc01"
 
     implementation 'com.google.zxing:core:3.4.1'
+
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.14.1'
+
+    // AndroidVideoCache
+    implementation 'com.danikula:videocache:2.7.1'
+
+//    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
+//    implementation 'com.google.android.exoplayer:exoplayer-dash:2.14.1'
+//    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
+
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.23'
+
+    // 权限请求框架：https://github.com/getActivity/XXPermissions
+    implementation 'com.hjq:xxpermissions:9.8'
+
 }

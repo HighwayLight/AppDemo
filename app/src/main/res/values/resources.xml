@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SelectIconView">
+        <attr name="selected_icon_id" format="reference|color" />
+        <attr name="unSelect_icon_id" format="reference|color" />
+    </declare-styleable>
+
+
+    <declare-styleable name="CheckView">
+        <attr name="checked_icon_id" format="reference|color" />
+        <attr name="unCheck_icon_id" format="reference|color" />
+    </declare-styleable>
+</resources>

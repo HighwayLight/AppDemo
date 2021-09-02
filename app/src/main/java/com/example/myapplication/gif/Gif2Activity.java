@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.gif;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +10,8 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +31,14 @@ public class Gif2Activity extends AppCompatActivity {
     public static final String RESULT_GIF = "gif";
 
     private GifImageView gifView3;
+
+    private String activityStatus = "unknow";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gif_2);
-
+        activityStatus = "onCreate";
         gifView3 = findViewById(R.id.gif2);
 
         gifView3.setOnClickListener(new View.OnClickListener() {
@@ -51,21 +56,12 @@ public class Gif2Activity extends AppCompatActivity {
 
 
         if (GifActivity.gif != null) {
-//            gifView3.setImageDrawable(GifActivity.gif);
-//            GifActivity.multiCallback.addView(gifView3);
-//            GifActivity.gif.setCallback(GifActivity.multiCallback);
-            gifView3.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    gifView3.setImageDrawable(GifActivity.gif);
-                    GifActivity.multiCallback.addView(gifView3);
-                    GifActivity.gif.setCallback(GifActivity.multiCallback);
-                }
-            },80);
-
+            gifView3.setImageDrawable(GifActivity.gif);
+            Log.e("Gif2", "onCreate " + ", gif.Visible = " + GifActivity.gif.isVisible());
         }
 
     }
+
 
 
     @Override
@@ -127,7 +123,55 @@ public class Gif2Activity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        GifActivity.multiCallback.removeView(gifView3);
-        GifActivity.gif.setCallback(GifActivity.multiCallback);
+        activityStatus = "onDestroy";
+//        GifActivity.multiCallback.removeView(gifView3);
+//        GifActivity.gif.setCallback(GifActivity.multiCallback);
+
+        Log.e("Gif2", "onDestroy " + ", gif.Visible = " + GifActivity.gif.isVisible());
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        activityStatus = "onStart";
+        Log.e("Gif2", "onStart " + ", gif.Visible = " + GifActivity.gif.isVisible());
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        activityStatus = "onResume";
+        Log.e("Gif2", "onResume " + ", gif.Visible = " + GifActivity.gif.isVisible());
+        if (GifActivity.gif != null) {
+            gifView3.setImageDrawable(GifActivity.gif);
+        }
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        activityStatus = "onPause";
+        Log.e("Gif2", "onPause " + ", gif.Visible = " + GifActivity.gif.isVisible());
+        if (GifActivity.gif != null) {
+            gifView3.setImageDrawable(null);
+        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        activityStatus = "onStop";
+        Log.e("Gif2", "onStop " + ", gif.Visible = " + GifActivity.gif.isVisible());
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        activityStatus = "onRestart";
+        Log.e("Gif2", "onRestart " + ", gif.Visible = " + GifActivity.gif.isVisible());
     }
 }

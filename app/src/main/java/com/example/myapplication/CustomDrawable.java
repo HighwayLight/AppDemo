@@ -100,10 +100,17 @@ public class CustomDrawable extends Drawable {
 
             _paint.setShader(linearGradient);
             canvas.drawRect(0, 0, x, y, _paint);
-
-
         }
-
+//        canvas.drawCircle(15, 15, 15, _paint); //绘制圆形
+//        _paint.setColor(Color.parseColor("#FFFFFF"));
+//        _paint.setTextSize(9);
+//        _paint.setTextAlign(Paint.Align.CENTER);
+//
+//        //计算baseline
+//        Paint.FontMetrics fontMetrics = _paint.getFontMetrics();
+//        float distance = (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom;
+//        float baseline = rect.centerY() + distance;
+//        canvas.drawText( String.valueOf(1), rect.centerX(), baseline, _paint);
         canvas.restoreToCount(sc);
     }
 

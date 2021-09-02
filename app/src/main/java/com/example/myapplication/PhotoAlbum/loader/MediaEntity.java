@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.PhotoAlbum.loader;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,15 +12,23 @@ import com.example.myapplication.process.AnyProcess;
 @AnyProcess
 public class MediaEntity implements Parcelable {
     public String URI;//资源地址
-    public int type;//MediaType 媒体类型
+    public String name;
+    public long time;
+    public int mediaType;//MediaType 媒体类型
     public long size;
     public int id;//媒体ID
     public String parentDir;
 
+    public boolean isSelected = false;
+    public int itemIndex = 0;//多选模式下 选中的item的index
+
+
     @AnyProcess
-    public MediaEntity(String URI, int type, long size, int id, String parentDir) {
+    public MediaEntity(String URI,  String name,  long time, int mediaType, long size, int id, String parentDir) {
         this.URI = URI;
-        this.type = type;
+        this.name = name;
+        this.time = time;
+        this.mediaType = mediaType;
         this.size = size;
         this.id = id;
         this.parentDir = parentDir;
@@ -34,7 +42,9 @@ public class MediaEntity implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.URI);
-        dest.writeInt(this.type);
+        dest.writeString(this.name);
+        dest.writeLong(this.time);
+        dest.writeInt(this.mediaType);
         dest.writeLong(this.size);
         dest.writeInt(this.id);
         dest.writeString(this.parentDir);
@@ -42,7 +52,9 @@ public class MediaEntity implements Parcelable {
 
     protected MediaEntity(Parcel in) {
         this.URI = in.readString();
-        this.type = in.readInt();
+        this.name = in.readString();
+        this.time = in.readLong();
+        this.mediaType = in.readInt();
         this.size = in.readLong();
         this.id = in.readInt();
         this.parentDir = in.readString();

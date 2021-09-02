@@ -1,18 +1,21 @@
-package com.example.myapplication;
+package com.example.myapplication.gif;
 
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hjq.permissions.XXPermissions;
+import com.example.myapplication.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,14 +41,16 @@ public class GifActivity extends AppCompatActivity {
     private GifImageView gifView;
     private GifImageView gifView2;
 
-    public static GifDrawable gif;
+    public static CustomGifDrawable gif;
     public static MultiCallback multiCallback;
 
+    String path;
+    public String activityStatus = "unknow";
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gif);
-
+        activityStatus = "onCreate";
         findViewById(R.id.button6).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,55 +70,52 @@ public class GifActivity extends AppCompatActivity {
         findViewById(R.id.jump).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                gifView.setImageDrawable(null);
                 startActivity(new Intent(GifActivity.this, Gif2Activity.class));
             }
         });
+
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_VIDEO_PICKER_REQUEST_CODE){
+        if (requestCode == IMAGE_VIDEO_PICKER_REQUEST_CODE) {
             if (data == null) {
                 return;
             }
             Uri uri = data.getData();
             String type = data.getType();
-            Log.e("GifActivity", "type = " + type);
-            Log.e("GifActivity", "uri = " + uri);
             if (uri == null) {
                 return;
             }
-            String path = getRealPathFromURI(uri, RESULT_GIF);
-            Log.e("GifActivity", "path = " + path);
+            path = getRealPathFromURI(uri, RESULT_GIF);
             if (path.endsWith(".gif")) {
-                Log.e("GifActivity", "type = .gif");
 //                gifView.setImageURI(uri);
                 try {
                     File file = new File(path);
-                    Log.e("GifActivity", ".gif.length = " + file.length()/1024 + "kb");
+                    Log.e("GifActivity", ".gif.length = " + file.length() / 1024 + "kb");
                     if (file.length() > 5 * 1024 * 1024) {
                     }
                     multiCallback = new MultiCallback();
 
-                    gif = new GifDrawable(path);
+                    gif = new CustomGifDrawable(path, this);
 
                     gifView.setImageDrawable(gif);
-                    multiCallback.addView(gifView);
-                    gif.setCallback(multiCallback);
+//                    multiCallback.addView(gifView);
+//                    gif.setCallback(multiCallback);
 
 
-                    gifView2.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            gifView2.setImageDrawable(gif);
-                            multiCallback.addView(gifView2);
-
-                            gif.setCallback(multiCallback);
-                        }
-                    },500);
+//                    gifView2.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            gifView2.setImageDrawable(gif);
+//                            multiCallback.addView(gifView2);
+//
+//                            gif.setCallback(multiCallback);
+//                        }
+//                    }, 500);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -148,23 +150,47 @@ public class GifActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+        activityStatus = "onRestart";
+        Log.e("Gif", "onRestart, gif.Visible = " + gif.isVisible());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        activityStatus = "onResume";
         if (gif != null) {
-            Log.e("Gif", "gif.isRunning() = " + gif.isRunning());
-//            gif.setVisible(true, true);
-//            gifView.setImageDrawable(null);
-//            gifView.setImageDrawable(gif);
-//            multiCallback.addView(gifView);
-//
-//            gifView2.setImageDrawable(null);
-//            gifView2.setImageDrawable(gif);
-//            multiCallback.addView(gifView2);
-//
-//            gif.setCallback(multiCallback);
+            Log.e("Gif", "onResume, gif.Visible = " + gif.isVisible());
+            if (gifView.getDrawable() == null) {
+                gifView.setImageDrawable(gif);
+            }
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        activityStatus = "onStart";
+    }
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        activityStatus = "onPause";
+        if (gif != null) {
+            Log.e("Gif", "onPause, gif.Visible = " + gif.isVisible());
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        activityStatus = "onStop";
+        if (gif != null) {
+            Log.e("Gif", "onStop, gif.Visible = " + gif.isVisible());
+        }
+    }
+
+
 }

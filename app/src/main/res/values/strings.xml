@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="test">test</string>
+    <string name="tma_all_image">所有图片</string>
+    <string name="tma_all_dir_name">所有图片和视频</string>
+    <string name="tma_video_dir_name">所有视频</string>
 </resources>

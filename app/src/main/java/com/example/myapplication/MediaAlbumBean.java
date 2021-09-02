@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.myapplication.PhotoAlbum.loader.MediaEntity;
+
 import java.util.ArrayList;
 
 /**

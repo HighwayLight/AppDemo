@@ -38,8 +38,9 @@
         <activity android:name=".scroll.ScrollActivity"></activity>
         <activity android:name=".CustomViewActivity"></activity>
         <activity android:name=".video.VideoActivity"></activity>
-        <activity android:name=".GifActivity"></activity>
-        <activity android:name=".Gif2Activity"></activity>
+        <activity android:name=".gif.GifActivity"></activity>
+        <activity android:name=".gif.Gif2Activity"></activity>
+        <activity android:name=".PhotoAlbum.PhotoAlbumActivity"></activity>
 
         <service
             android:name="com.example.myapplication.service.StatusAccessibilityService"

@@ -2,8 +2,6 @@ package com.example.myapplication;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
@@ -20,7 +18,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -29,15 +26,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.myapplication.PhotoAlbum.PhotoAlbumActivity;
+import com.example.myapplication.PhotoAlbum.SelectedDrawable;
+import com.example.myapplication.PhotoAlbum.loader.DataCallback;
+import com.example.myapplication.PhotoAlbum.loader.Folder;
 import com.example.myapplication.decode.ImageUtil;
+import com.example.myapplication.gif.GifActivity;
 import com.example.myapplication.scroll.ScrollActivity;
 import com.example.myapplication.video.VideoActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.myapplication.LoaderM.LOADER_ID;
+import static com.example.myapplication.PhotoAlbum.loader.LoaderM.LOADER_ID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     int pageindex = 0;
 
     ImageView imageView;
+    ImageView ivDrawable;
 
     boolean flag = false;
 
@@ -71,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
 //                getAlbum();
             }
         });
+        ivDrawable = findViewById(R.id.iv_drawable);
+        SelectedDrawable drawable = new SelectedDrawable(15, 1, 8);
+        ivDrawable.setImageDrawable(drawable);
+
+
         imageView = findViewById(R.id.imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
         CustomDrawable customDrawable = new CustomDrawable(_backgroundImage);
 //        CustomDrawable customDrawable = new CustomDrawable(screenWidth, Dp2Px(this, 200));
         view.setBackground(customDrawable);
-
+//        view.setBackground(drawable);
+//        ivDrawable.setImageDrawable(customDrawable);
 
         findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,6 +168,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, GifActivity.class));
+            }
+        });
+
+        findViewById(R.id.button7).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PhotoAlbumActivity.class));
             }
         });
     }
@@ -214,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                Cursor cursor = getContentResolver().query(mImageUri, null, null, null, sortOrder);
+                Cursor cursor = getContentResolver().query(mImageUri, null, null, null, null);
                 while (cursor.moveToNext()) {
                     String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));// 1.获取图片的路径
                     Log.e("TAG", path);
@@ -258,15 +275,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void imageLoader() {
 
-        this.getLoaderManager().initLoader(LOADER_ID, null,
-                new ImageLoader(this, "all", 1, pageindex, 2, new DataCallback() {
-                    @Override
-                    public void onData(List list) {
-                        Log.e("ZKMediaLibrary", "queryMedia() / onData().list.size() = "
-                                + (list == null ? "null" : list.size()));
-                    }
-                }));
-        pageindex++;
+//        this.getLoaderManager().initLoader(LOADER_ID, null,
+//                new ImageLoader(this, "all", 1, pageindex, 2, new DataCallback() {
+//                    @Override
+//                    public void onData(List list) {
+//                        Log.e("ZKMediaLibrary", "queryMedia() / onData().list.size() = "
+//                                + (list == null ? "null" : list.size()));
+//                    }
+//
+//                    @Override
+//                    public void onData(ArrayList<Folder> list) {
+//
+//                    }
+//                }));
+//        pageindex++;
     }
 
     private String getFolderPath(String filePath) {
